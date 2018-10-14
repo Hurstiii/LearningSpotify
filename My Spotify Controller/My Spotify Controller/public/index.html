@@ -93,7 +93,6 @@
 */
         var currentKeyword = ""
         function searchForSong() {
-          console.log(currentKeyword)
           var keyword = document.getElementById("song-searchbar").value; 
           if(!(keyword === currentKeyword)) {
             var url = "https://api.spotify.com/v1/search?";
@@ -120,8 +119,8 @@
                     var track_uri = element.uri;
                     var track_name = element.name;
                     var track_artists = element.artists;
-                    var track_duration = element.duration;
-                    var track_explicit = element.explicit;
+                    var track_duration = duration;
+                    var track_explicit = explicit;
                     resultsSource +=  '<div class="track-container"' +
                     'trackURI="'+ track_uri +'">' +
                     '<img class="track-image" src="'+ image_url +'">' +
@@ -144,8 +143,13 @@
                           play($(this).attr("trackURI"));
                     })
                   });
-                }
+                } 
               });
+            } else {
+              var resultsSource = document.getElementById("results-template").innerHTML,
+                    resultsTemplate = Handlebars.compile(resultsSource),
+                    resultsPlaceholder = document.getElementById('song-search-results');
+                    resultsPlaceholder.innerHTML = resultsTemplate({});
             }
           }
           currentKeyword = keyword;
