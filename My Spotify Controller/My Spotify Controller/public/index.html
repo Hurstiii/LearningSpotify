@@ -18,6 +18,9 @@
   </head>
 
   <body>
+    <div class="navbar-p">
+
+    </div>
     <div class="container">
       <div id="login">
         <h1>This is an example of the Authorization Code flow</h1>
@@ -121,6 +124,8 @@
                     var track_artists = element.artists;
                     var track_duration = duration;
                     var track_explicit = explicit;
+                    resultsSource += '<div class="track-outer-container">';
+                    
                     resultsSource +=  '<div class="track-container"' +
                     'trackURI="'+ track_uri +'">' +
                     '<img class="track-image" src="'+ image_url +'">' +
@@ -135,13 +140,23 @@
                     '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">'+ track_explicit +'</dd>' +
                     '</dl>' +
                     '</div>' +
-                    '</div>';
+                    '</div>'
+                    resultsSource += '<div class="track-options">' +
+                      '<button class="add-to-fav-btn">' +
+                      //'<button class="-btn">' +
+                      '</div></div>';
                     var resultsTemplate = Handlebars.compile(resultsSource),
                         resultsPlaceholder = document.getElementById('song-search-results');
                         resultsPlaceholder.innerHTML = resultsTemplate({});
                     $(".track-container").mousedown( function() {
-                          play($(this).attr("trackURI"));
-                    })
+                        play($(this).attr("trackURI"));
+                    });
+                    $(".add-to-fav-btn").mousedown( function() {
+                        var uri = $(this).parent().siblings().attr("trackURI");
+                        uri = uri.slice(14);
+                        trackList.push(uri)
+                        console.log(trackList);
+                    });
                   });
                 } 
               });
@@ -211,6 +226,65 @@
               setTimeout(updateDevices, 5000);
             }
 
+
+/*
+*----------------------------------------------------------------------------------------------------------------------------------------------------
+* Update Favourite Tracks Section
+* presents all the tracks in the trackslist into the favorite tracks section of the page
+*/
+            // Holds the uri's of the songs that are to presented in the favourite songs section
+            var trackList = ["6rPO02ozF3bM7NnOV4h6s2", "0Sayb1EWTywPttwJo7zjBt", "3EPXxR3ImUwfayaurPi3cm", "2WwzQJt4hG7YC6x16ZTYFM","6mcxQ1Y3uQRU0IHsvdNLH1"]
+            var track_list_length = 0;
+            function updateFavTracks() {
+              if(!(trackList.length === track_list_length)) {
+                track_list_length = trackList.length;
+                var tracksSource = document.getElementById("tracks-template").innerHTML
+                trackList.forEach((element) => {
+                  $.ajax({
+                    url: 	"https://api.spotify.com/v1/tracks/" + element,
+                    headers: {
+                      'Authorization': 'Bearer ' + access_token
+                    },
+                    success: function(response) {
+                      //console.log(response);
+                      //console.log(response.explicit);
+                      var duration = msToMin(response.duration_ms); 
+                      var explicit = (response.explicit === true) ? "Yes" : "No";
+
+                      var image_url = response.album.images[1].url;
+                      var track_uri = response.uri;
+                      var track_name = response.name;
+                      var track_artists = response.artists;
+                      var track_duration = duration;
+                      var track_explicit = explicit;
+                      tracksSource +=  '<div class="track-container"' +
+                      'trackURI="'+ track_uri +'">' +
+                      '<img class="track-image" src="'+ image_url +'">' +
+                      '<div class="track-details">' +
+                      '<dl>' +
+                      '<dt class="track-details-dt">Name</dt><dd class="track-details-dd">'+ track_name +'</dd>' +
+                      '<dt class="track-details-dt">Artists</dt>';
+                      track_artists.forEach(element => {
+                        tracksSource += '<dd class="track-details-dd">'+ element.name +'</dd>';
+                      });
+                      tracksSource += '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">'+ track_duration +'</dd>' +
+                      '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">'+ track_explicit +'</dd>' +
+                      '</dl>' +
+                      '</div>' +
+                      '</div>';
+                      var tracksTemplate = Handlebars.compile(tracksSource),
+                          tracksPlaceholder = document.getElementById('tracks');
+                          tracksPlaceholder.innerHTML = tracksTemplate({});
+                      $(".track-container").mousedown( function() {
+                            play($(this).attr("trackURI"));
+                      })
+                    }
+                  }); 
+                });
+              } 
+              setTimeout(updateFavTracks, 2000);
+            }
+
         var oauthSource = document.getElementById('oauth-template').innerHTML,
             oauthTemplate = Handlebars.compile(oauthSource),
             oauthPlaceholder = document.getElementById('oauth');
@@ -226,6 +300,7 @@
         var access_token = params.access_token,
             refresh_token = params.refresh_token,
             error = params.error;
+
         if (error) {
           alert('There was an error during the authentication');
         } else {
@@ -238,51 +313,8 @@
             
             searchForSong();
             updateDevices();
-
-            var trackList = ["6rPO02ozF3bM7NnOV4h6s2", "0Sayb1EWTywPttwJo7zjBt", "3EPXxR3ImUwfayaurPi3cm", "2WwzQJt4hG7YC6x16ZTYFM","6mcxQ1Y3uQRU0IHsvdNLH1"]
-            var tracksSource = document.getElementById("tracks-template").innerHTML
-            trackList.forEach((element) => {
-              $.ajax({
-                url: 	"https://api.spotify.com/v1/tracks/" + element,
-                headers: {
-                  'Authorization': 'Bearer ' + access_token
-                },
-                success: function(response) {
-                  //console.log(response);
-                  //console.log(response.explicit);
-                  var duration = msToMin(response.duration_ms); 
-                  var explicit = (response.explicit === true) ? "Yes" : "No";
-
-                  var image_url = response.album.images[1].url;
-                  var track_uri = response.uri;
-                  var track_name = response.name;
-                  var track_artists = response.artists;
-                  var track_duration = duration;
-                  var track_explicit = explicit;
-                  tracksSource +=  '<div class="track-container"' +
-                  'trackURI="'+ track_uri +'">' +
-                  '<img class="track-image" src="'+ image_url +'">' +
-                  '<div class="track-details">' +
-                  '<dl>' +
-                  '<dt class="track-details-dt">Name</dt><dd class="track-details-dd">'+ track_name +'</dd>' +
-                  '<dt class="track-details-dt">Artists</dt>';
-                  track_artists.forEach(element => {
-                    tracksSource += '<dd class="track-details-dd">'+ element.name +'</dd>';
-                  });
-                  tracksSource += '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">'+ track_duration +'</dd>' +
-                  '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">'+ track_explicit +'</dd>' +
-                  '</dl>' +
-                  '</div>' +
-                  '</div>';
-                  var tracksTemplate = Handlebars.compile(tracksSource),
-                      tracksPlaceholder = document.getElementById('tracks');
-                      tracksPlaceholder.innerHTML = tracksTemplate({});
-                  $(".track-container").mousedown( function() {
-                        play($(this).attr("trackURI"));
-                  })
-                }
-              }); 
-            });
+            updateFavTracks();
+            
             //take them to the main screen
             $('#login').hide();
             $('#loggedin').show();
