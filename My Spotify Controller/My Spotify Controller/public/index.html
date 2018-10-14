@@ -19,7 +19,8 @@
 
   <body>
     <div class="navbar-p">
-
+      <img src="logo.png">
+      <h1>Learning Spotify</h1>
     </div>
     <div class="container">
       <div id="login">
@@ -104,7 +105,6 @@
               type: "track"
             });
             var joined_url = url + ext;
-            //console.log(joined_url);
             if(!(keyword === "")) {
               $.ajax({
                 url: 	joined_url,
@@ -112,7 +112,6 @@
                   'Authorization': 'Bearer ' + access_token
                 },
                 success: function(response) {
-                  //console.log(response)
                   var results = response.tracks.items;
                   var resultsSource = document.getElementById("results-template").innerHTML;
                   results.forEach(element => {
@@ -125,7 +124,6 @@
                     var track_duration = duration;
                     var track_explicit = explicit;
                     resultsSource += '<div class="track-outer-container">';
-                    
                     resultsSource +=  '<div class="track-container"' +
                     'trackURI="'+ track_uri +'">' +
                     '<img class="track-image" src="'+ image_url +'">' +
@@ -143,19 +141,40 @@
                     '</div>'
                     resultsSource += '<div class="track-options">' +
                       '<button class="add-to-fav-btn">' +
-                      //'<button class="-btn">' +
+                      '<button class="remove-from-fav-btn">' +
                       '</div></div>';
                     var resultsTemplate = Handlebars.compile(resultsSource),
                         resultsPlaceholder = document.getElementById('song-search-results');
                         resultsPlaceholder.innerHTML = resultsTemplate({});
-                    $(".track-container").mousedown( function() {
+                    $(".remove-from-fav-btn").hide();
+                    $(".track-container").mousedown(function() {
                         play($(this).attr("trackURI"));
                     });
-                    $(".add-to-fav-btn").mousedown( function() {
+                    $(".add-to-fav-btn").mousedown(function() {
                         var uri = $(this).parent().siblings().attr("trackURI");
                         uri = uri.slice(14);
-                        trackList.push(uri)
-                        console.log(trackList);
+                        if ((trackList.find(element => {
+                          return uri === element
+                        })) === undefined) {
+                          trackList.push(uri);
+                          $(this).hide();
+                          $(this).siblings(".remove-from-fav-btn").show();
+                        } else {
+                          
+                        }
+                    });
+                    $(".remove-from-fav-btn").mousedown(function() {
+                        var uri = $(this).parent().siblings().attr("trackURI");
+                        uri = uri.slice(14);
+                        if (!((trackList.find(element => {
+                          return uri === element
+                        })) === undefined)) {
+                          trackList.splice( trackList.indexOf(uri), 1);
+                          $(this).hide();
+                          $(this).siblings(".add-to-fav-btn").show();
+                        } else {
+                          
+                        }
                     });
                   });
                 } 
@@ -217,7 +236,6 @@
                         "device_ids": [id]
                       }),
                       success: function(response) {
-                        console.log(id);
                       }
                     });
                   });
@@ -246,8 +264,6 @@
                       'Authorization': 'Bearer ' + access_token
                     },
                     success: function(response) {
-                      //console.log(response);
-                      //console.log(response.explicit);
                       var duration = msToMin(response.duration_ms); 
                       var explicit = (response.explicit === true) ? "Yes" : "No";
 
@@ -334,13 +350,9 @@
                 'authorization': 'Bearer ' + access_token,
               },
               success: function (response) {
-                console.log("successful");
-                console.log(response);
               }
             });
             } else {
-            //var ext = "?device_id="
-            //console.log(url)
             $.ajax({
               url: url,
               method: 'PUT',
@@ -354,8 +366,6 @@
                 'authorization': 'Bearer ' + access_token,
               },
               success: function (response) {
-                console.log("successful");
-                console.log(response);
               }
             });
             }
@@ -384,12 +394,9 @@
                 'Authorization': 'Bearer ' + access_token
               },
               success: function(response) {
-                console.log("successful");
-                console.log(response);
               }
-            });  
+            });
           });
-
           //FINALLY FUCKING WORKS!
           document.getElementById('play').addEventListener('click', function () {
             play();
