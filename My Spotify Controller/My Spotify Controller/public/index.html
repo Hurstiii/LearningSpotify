@@ -1,68 +1,71 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Example of the Authorization Code flow with Spotify</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="personal.css">
-    <style type="text/css">
-      #login, #loggedin {
-        display: none;
-      }
-      .text-overflow {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        width: 500px;
-      }
-    </style>
-  </head>
 
-  <body>
-    <div class="navbar-p">
-      <img src="logo.png">
-      <h1>Learning Spotify</h1>
+<head>
+  <title>Example of the Authorization Code flow with Spotify</title>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="personal.css">
+  <style type="text/css">
+    #login,
+    #loggedin {
+      display: none;
+    }
+
+    .text-overflow {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 500px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="navbar-p">
+    <img src="logo.png">
+    <h1>Learning Spotify</h1>
+  </div>
+  <div class="container">
+    <div id="login">
+      <h1>This is an example of the Authorization Code flow</h1>
+      <a href="/login" class="btn btn-primary">Log in with Spotify</a>
     </div>
-    <div class="container">
-      <div id="login">
-        <h1>This is an example of the Authorization Code flow</h1>
-        <a href="/login" class="btn btn-primary">Log in with Spotify</a>
+    <div id="loggedin">
+      <div id="devices">
       </div>
-      <div id="loggedin">
-        <div id="devices">
+      <div id="playback">
+        <button class="btn btn-default" id="play">Play</button>
+        <button class="btn btn-default" id="pause">Pause</button>
+      </div>
+      <div id="tracks">
+      </div>
+      <div id="search-outer-container">
+        <h2 id="searchbar-title">Search</h2>
+        <div id="searchbar-container">
+          <img id="searchbar-image" src="magnifying glass.png">
+          <input id="song-searchbar" type="search" placeholder="Search">
         </div>
-        <div id="playback">
-          <button class="btn btn-default" id="play">Play</button>
-          <button class="btn btn-default" id="pause">Pause</button>
+        <div id="song-search-results">
         </div>
-        <div id="tracks">
-        </div>
-        <div id="search-outer-container">
-          <h2 id="searchbar-title">Search</h2>
-          <div id="searchbar-container">
-            <img id="searchbar-image" src="magnifying glass.png">
-            <input id="song-searchbar" type="search" placeholder="Search">
-          </div>
-          <div id="song-search-results">
-          </div>
-        </div>
-        <!-- <div id="oauth">
+      </div>
+      <!-- <div id="oauth">
         </div> -->
-        <!-- <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button> -->
-      </div>
+      <!-- <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button> -->
     </div>
+  </div>
 
-    <script id="devices-template" type="text/x-handlebars-template">
+  <script id="devices-template" type="text/x-handlebars-template">
       <h2>Devices: {{device_count}}</h2>
     </script>
 
-    <script id="tracks-template" type="text/x-handlebars-template">
+  <script id="tracks-template" type="text/x-handlebars-template">
       <h2>Favourite Tracks</h2>
     </script>
 
-    <script id="results-template" type="text/x-handlebars-template">
+  <script id="results-template" type="text/x-handlebars-template">
     </script>
 
-    <!-- <script id="oauth-template" type="text/x-handlebars-template">
+  <!-- <script id="oauth-template" type="text/x-handlebars-template">
       <h2>oAuth info</h2>
       <dl class="dl-horizontal">
         <dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
@@ -70,310 +73,310 @@
       </dl>
     </script> -->
 
-    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    
-    <script>
-      (function() {
-        /**
-         * Obtains parameters from the hash of the URL
-         * @return Object
-         */
-        function getHashParams() {
-          var hashParams = {};
-          var e, r = /([^&;=]+)=?([^&;]*)/g,
-              q = window.location.hash.substring(1);
-          while ( e = r.exec(q)) {
-             hashParams[e[1]] = decodeURIComponent(e[2]);
-          }
-          return hashParams;
+  <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+
+  <script>
+    (function () {
+      /**
+       * Obtains parameters from the hash of the URL
+       * @return Object
+       */
+      function getHashParams() {
+        var hashParams = {};
+        var e, r = /([^&;=]+)=?([^&;]*)/g,
+          q = window.location.hash.substring(1);
+        while (e = r.exec(q)) {
+          hashParams[e[1]] = decodeURIComponent(e[2]);
         }
+        return hashParams;
+      }
 
 
-/*
-*------------------------------------------------------------------------------------------------------------------
-* Handles the searching and presenting of the songs using the 
-*   @param keyword from the 
-*   @input searchbar
-*
-*/
-        var currentKeyword = ""
-        function searchForSong() {
-          var keyword = document.getElementById("song-searchbar").value; 
-          if(!(keyword === currentKeyword)) {
-            var url = "https://api.spotify.com/v1/search?";
-            var ext = jQuery.param({
-              q: keyword,
-              type: "track"
-            });
-            var joined_url = url + ext;
-            if(!(keyword === "")) {
-              $.ajax({
-                url: 	joined_url,
-                headers: {
-                  'Authorization': 'Bearer ' + access_token
-                },
-                success: function(response) {
-                  var results = response.tracks.items;
-                  var resultsSource = document.getElementById("results-template").innerHTML;
-                  results.forEach(element => {
-                    var duration = msToMin(element.duration_ms); 
-                    var explicit = (element.explicit === true) ? "Yes" : "No";
-                    var image_url = element.album.images[1].url;
-                    var track_uri = element.uri;
-                    var track_name = element.name;
-                    var track_artists = element.artists;
-                    var track_duration = duration;
-                    var track_explicit = explicit;
-                    resultsSource += '<div class="track-outer-container">';
-                    resultsSource +=  '<div class="track-container"' +
-                    'trackURI="'+ track_uri +'">' +
-                    '<img class="track-image" src="'+ image_url +'">' +
+      /*
+      *------------------------------------------------------------------------------------------------------------------
+      * Handles the searching and presenting of the songs using the 
+      *   @param keyword from the 
+      *   @input searchbar
+      *
+      */
+      var currentKeyword = ""
+      function searchForSong() {
+        var keyword = document.getElementById("song-searchbar").value;
+        if (!(keyword === currentKeyword)) {
+          var url = "https://api.spotify.com/v1/search?";
+          var ext = jQuery.param({
+            q: keyword,
+            type: "track"
+          });
+          var joined_url = url + ext;
+          if (!(keyword === "")) {
+            $.ajax({
+              url: joined_url,
+              headers: {
+                'Authorization': 'Bearer ' + access_token
+              },
+              success: function (response) {
+                var results = response.tracks.items;
+                var resultsSource = document.getElementById("results-template").innerHTML;
+                results.forEach(element => {
+                  var duration = msToMin(element.duration_ms);
+                  var explicit = (element.explicit === true) ? "Yes" : "No";
+                  var image_url = element.album.images[1].url;
+                  var track_uri = element.uri;
+                  var track_name = element.name;
+                  var track_artists = element.artists;
+                  var track_duration = duration;
+                  var track_explicit = explicit;
+                  resultsSource += '<div class="track-outer-container">';
+                  resultsSource += '<div class="track-container"' +
+                    'trackURI="' + track_uri + '">' +
+                    '<img class="track-image" src="' + image_url + '">' +
                     '<div class="track-details">' +
                     '<dl>' +
-                    '<dt class="track-details-dt">Name</dt><dd class="track-details-dd">'+ track_name +'</dd>' +
+                    '<dt class="track-details-dt">Name</dt><dd class="track-details-dd">' + track_name + '</dd>' +
                     '<dt class="track-details-dt">Artists</dt>';
-                    track_artists.forEach(element => {
-                      resultsSource += '<dd class="track-details-dd">'+ element.name +'</dd>';
-                    });
-                    resultsSource += '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">'+ track_duration +'</dd>' +
-                    '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">'+ track_explicit +'</dd>' +
+                  track_artists.forEach(element => {
+                    resultsSource += '<dd class="track-details-dd">' + element.name + '</dd>';
+                  });
+                  resultsSource += '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">' + track_duration + '</dd>' +
+                    '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">' + track_explicit + '</dd>' +
                     '</dl>' +
                     '</div>' +
                     '</div>'
-                    resultsSource += '<div class="track-options">' +
-                      '<button class="add-to-fav-btn">' +
-                      '<button class="remove-from-fav-btn">' +
-                      '</div></div>';
-                    var resultsTemplate = Handlebars.compile(resultsSource),
-                        resultsPlaceholder = document.getElementById('song-search-results');
-                        resultsPlaceholder.innerHTML = resultsTemplate({});
-                    // if(!((trackList.find(element => {
-                    //       return  === element
-                    //     })) === undefined)) {
-                    //       $(".remove-from-fav-btn").show();
-                    //       $(".add-to-fav-btn").hide();
-                    //     } else {
-                    //       $(".remove-from-fav-btn").hide();
-                    //       $(".add-to-fav-btn").show();
-                    //     }
-                    $("#song-search-results .track-container").each(function(index) {
+                  resultsSource += '<div class="track-options">' +
+                    '<button class="add-to-fav-btn">' +
+                    '<button class="remove-from-fav-btn">' +
+                    '</div></div>';
+                  var resultsTemplate = Handlebars.compile(resultsSource),
+                    resultsPlaceholder = document.getElementById('song-search-results');
+                  resultsPlaceholder.innerHTML = resultsTemplate({});
+                  // if(!((trackList.find(element => {
+                  //       return  === element
+                  //     })) === undefined)) {
+                  //       $(".remove-from-fav-btn").show();
+                  //       $(".add-to-fav-btn").hide();
+                  //     } else {
+                  //       $(".remove-from-fav-btn").hide();
+                  //       $(".add-to-fav-btn").show();
+                  //     }
+                  $("#song-search-results .track-container").each(function (index) {
                     //console.log($(".track-container"));
                     // console.log("Hello");
                     var uri = $(this).attr("trackURI");
                     var element = $(this);
                     uri = uri.slice(14);
                     //console.log(uri);
-                    if(!((trackList.find(match => {
-                        return uri === match
-                      })) === undefined)) {
-                        element.parent().children(".track-options").children(".add-to-fav-btn").hide();
-                        element.parent().children(".track-options").children(".remove-from-fav-btn").show();
-                      } else {
-                        element.parent().children(".track-options").children(".add-to-fav-btn").show();
-                        element.parent().children(".track-options").children(".remove-from-fav-btn").hide();
-                      }
-                    });   
-                        
-                    
-                    $("#song-search-results .track-container").mousedown(function() {
-                        play($(this).attr("trackURI"));
-                    });
-                    $(".add-to-fav-btn").mousedown(function() {
-                        var uri = $(this).parent().siblings().attr("trackURI");
-                        uri = uri.slice(14);
-                        if ((trackList.find(element => {
-                          return uri === element
-                        })) === undefined) {
-                          trackList.push(uri);
-                          $(this).hide();
-                          $(this).siblings(".remove-from-fav-btn").show();
-                        } else {
-                          
-                        }
-                    });
-                    $(".remove-from-fav-btn").mousedown(function() {
-                        var uri = $(this).parent().siblings().attr("trackURI");
-                        uri = uri.slice(14);
-                        if (!((trackList.find(element => {
-                          return uri === element
-                        })) === undefined)) {
-                          trackList.splice( trackList.indexOf(uri), 1);
-                          $(this).hide();
-                          $(this).siblings(".add-to-fav-btn").show();
-                        } else {
-                          
-                        }
-                    });
+                    if (!((trackList.find(match => {
+                      return uri === match
+                    })) === undefined)) {
+                      element.parent().children(".track-options").children(".add-to-fav-btn").hide();
+                      element.parent().children(".track-options").children(".remove-from-fav-btn").show();
+                    } else {
+                      element.parent().children(".track-options").children(".add-to-fav-btn").show();
+                      element.parent().children(".track-options").children(".remove-from-fav-btn").hide();
+                    }
                   });
-                } 
-              });
-              // 6rPO02ozF3bM7NnOV4h6s2
-                } else {
-              var resultsSource = document.getElementById("results-template").innerHTML,
-                    resultsTemplate = Handlebars.compile(resultsSource),
-                    resultsPlaceholder = document.getElementById('song-search-results');
-                    resultsPlaceholder.innerHTML = resultsTemplate({});
-            }
-          }
-          currentKeyword = keyword;
-          setTimeout(searchForSong, 500);
-        }
 
-/*
-*------------------------------------------------------------------------------------------------------------------
-* Updates the devices listed in real-time/without a refresh
-*
-*/
-        function updateDevices() {
+
+                  $("#song-search-results .track-container").mousedown(function () {
+                    play($(this).attr("trackURI"));
+                  });
+                  $(".add-to-fav-btn").mousedown(function () {
+                    var uri = $(this).parent().siblings().attr("trackURI");
+                    uri = uri.slice(14);
+                    if ((trackList.find(element => {
+                      return uri === element
+                    })) === undefined) {
+                      trackList.push(uri);
+                      $(this).hide();
+                      $(this).siblings(".remove-from-fav-btn").show();
+                    } else {
+
+                    }
+                  });
+                  $(".remove-from-fav-btn").mousedown(function () {
+                    var uri = $(this).parent().siblings().attr("trackURI");
+                    uri = uri.slice(14);
+                    if (!((trackList.find(element => {
+                      return uri === element
+                    })) === undefined)) {
+                      trackList.splice(trackList.indexOf(uri), 1);
+                      $(this).hide();
+                      $(this).siblings(".add-to-fav-btn").show();
+                    } else {
+
+                    }
+                  });
+                });
+              }
+            });
+            // 6rPO02ozF3bM7NnOV4h6s2
+          } else {
+            var resultsSource = document.getElementById("results-template").innerHTML,
+              resultsTemplate = Handlebars.compile(resultsSource),
+              resultsPlaceholder = document.getElementById('song-search-results');
+            resultsPlaceholder.innerHTML = resultsTemplate({});
+          }
+        }
+        currentKeyword = keyword;
+        setTimeout(searchForSong, 500);
+      }
+
+      /*
+      *------------------------------------------------------------------------------------------------------------------
+      * Updates the devices listed in real-time/without a refresh
+      *
+      */
+      function updateDevices() {
+        $.ajax({
+          url: 'https://api.spotify.com/v1/me/player/devices',
+          headers: {
+            'Authorization': 'Bearer ' + access_token
+          },
+          success: function (response) {
+            var devices = response.devices;
+            var imageTypes = new Array();
+            imageTypes["Computer"] = "computer big.png";
+            imageTypes["Smartphone"] = "smart phone big.png";
+            imageTypes["Speaker"] = "speaker big.png";
+            var devicesSource = document.getElementById("devices-template").innerHTML;
+            devicesSource += '<dl class="dl-horizontal">';
+            devices.forEach((element, index) => {
+              devicesSource += '<div class="device-container" id="device-' + index + '"><div class="device-details-container"><dt>Device Name</dt><dd id="device-name" class="text-overflow">' + element.name + '</dd>' +
+                '<dt>id</dt><dd id="device-id" class="text-overflow">' + element.id + '</dd>' +
+                '<dt>type</dt><dd id="device-type" class="text-overflow">' + element.type + '</dd>' +
+                '<dt>is_active</dt><dd id="device-active" class="text-overflow">' + element.is_active + '</dd>' +
+                '<dd><button class="btn btn-default" id="devices-sel" device-id="' + element.id + '">Select</button></dd></div><img id="devices-image" src="' + imageTypes[element.type] + '" height="114px"></div> <br>';
+            });
+            devicesSource += '</dl>';
+            //compile and inject the devices template into the main html body
+            var devicesTemplate = Handlebars.compile(devicesSource),
+              devicesPlaceHolder = document.getElementById("devices");
+            devicesPlaceHolder.innerHTML = devicesTemplate({
+              device_count: devices.length
+            });
+            // add a click event to the buttons that are made for each device
+            $("dd #devices-sel").mousedown(function () {
+              var id = $(this).attr("device-id");
               $.ajax({
-                url: 'https://api.spotify.com/v1/me/player/devices',
+                url: 'https://api.spotify.com/v1/me/player',
+                method: "PUT",
                 headers: {
                   'Authorization': 'Bearer ' + access_token
                 },
-                success: function(response) {
-                  var devices = response.devices;
-                  var imageTypes = new Array();
-                  imageTypes["Computer"] = "computer big.png";
-                  imageTypes["Smartphone"] = "smart phone big.png";
-                  imageTypes["Speaker"] = "speaker big.png";
-                  var devicesSource = document.getElementById("devices-template").innerHTML;
-                  devicesSource += '<dl class="dl-horizontal">';
-                  devices.forEach((element, index) => {
-                    devicesSource += '<div class="device-container" id="device-'+index+'"><div class="device-details-container"><dt>Device Name</dt><dd id="device-name" class="text-overflow">'+element.name+'</dd>' +
-                    '<dt>id</dt><dd id="device-id" class="text-overflow">'+element.id+'</dd>' +
-                    '<dt>type</dt><dd id="device-type" class="text-overflow">'+element.type+'</dd>' +
-                    '<dt>is_active</dt><dd id="device-active" class="text-overflow">'+element.is_active+'</dd>' +
-                    '<dd><button class="btn btn-default" id="devices-sel" device-id="'+element.id+'">Select</button></dd></div><img id="devices-image" src="'+ imageTypes[element.type] +'" height="114px"></div> <br>';
-                  });
-                  devicesSource += '</dl>';
-                  //compile and inject the devices template into the main html body
-                  var devicesTemplate = Handlebars.compile(devicesSource),
-                      devicesPlaceHolder = document.getElementById("devices");
-                      devicesPlaceHolder.innerHTML = devicesTemplate({
-                        device_count: devices.length
-                      });
-                  // add a click event to the buttons that are made for each device
-                  $("dd #devices-sel").mousedown( function() {
-                    var id = $(this).attr("device-id");
-                    $.ajax({
-                      url: 'https://api.spotify.com/v1/me/player',
-                      method: "PUT",
-                      headers: {
-                        'Authorization': 'Bearer ' + access_token
-                      },
-                      data: JSON.stringify({ //!Have to use JSON.stringify in order to send the data as a JSON object which the endpoint expects.
-                        "device_ids": [id]
-                      }),
-                      success: function(response) {
-                      }
-                    });
-                  });
+                data: JSON.stringify({ //!Have to use JSON.stringify in order to send the data as a JSON object which the endpoint expects.
+                  "device_ids": [id]
+                }),
+                success: function (response) {
                 }
               });
-              setTimeout(updateDevices, 5000);
-            }
+            });
+          }
+        });
+        setTimeout(updateDevices, 5000);
+      }
 
 
-/*
-*----------------------------------------------------------------------------------------------------------------------------------------------------
-* Update Favourite Tracks Section
-* presents all the tracks in the trackslist into the favorite tracks section of the page
-*/
-            // Holds the uri's of the songs that are to presented in the favourite songs section
-            var trackList = ["6rPO02ozF3bM7NnOV4h6s2", "0Sayb1EWTywPttwJo7zjBt", "3EPXxR3ImUwfayaurPi3cm", "2WwzQJt4hG7YC6x16ZTYFM","6mcxQ1Y3uQRU0IHsvdNLH1"]
-            var track_list_length = 0;
-            function updateFavTracks() {
-              if(!(trackList.length === track_list_length)) {
-                track_list_length = trackList.length;
-                var tracksSource = document.getElementById("tracks-template").innerHTML
-                trackList.forEach((element) => {
-                  $.ajax({
-                    url: 	"https://api.spotify.com/v1/tracks/" + element,
-                    headers: {
-                      'Authorization': 'Bearer ' + access_token
-                    },
-                    success: function(response) {
-                      var duration = msToMin(response.duration_ms); 
-                      var explicit = (response.explicit === true) ? "Yes" : "No";
+      /*
+      *----------------------------------------------------------------------------------------------------------------------------------------------------
+      * Update Favourite Tracks Section
+      * presents all the tracks in the trackslist into the favorite tracks section of the page
+      */
+      // Holds the uri's of the songs that are to presented in the favourite songs section
+      var trackList = ["6rPO02ozF3bM7NnOV4h6s2", "0Sayb1EWTywPttwJo7zjBt", "3EPXxR3ImUwfayaurPi3cm", "2WwzQJt4hG7YC6x16ZTYFM", "6mcxQ1Y3uQRU0IHsvdNLH1"]
+      var track_list_length = 0;
+      function updateFavTracks() {
+        if (!(trackList.length === track_list_length)) {
+          track_list_length = trackList.length;
+          var tracksSource = document.getElementById("tracks-template").innerHTML
+          trackList.forEach((element) => {
+            $.ajax({
+              url: "https://api.spotify.com/v1/tracks/" + element,
+              headers: {
+                'Authorization': 'Bearer ' + access_token
+              },
+              success: function (response) {
+                var duration = msToMin(response.duration_ms);
+                var explicit = (response.explicit === true) ? "Yes" : "No";
 
-                      var image_url = response.album.images[1].url;
-                      var track_uri = response.uri;
-                      var track_name = response.name;
-                      var track_artists = response.artists;
-                      var track_duration = duration;
-                      var track_explicit = explicit;
-                      tracksSource +=  '<div class="track-container"' +
-                      'trackURI="'+ track_uri +'">' +
-                      '<img class="track-image" src="'+ image_url +'">' +
-                      '<div class="track-details">' +
-                      '<dl>' +
-                      '<dt class="track-details-dt">Name</dt><dd class="track-details-dd">'+ track_name +'</dd>' +
-                      '<dt class="track-details-dt">Artists</dt>';
-                      track_artists.forEach(element => {
-                        tracksSource += '<dd class="track-details-dd">'+ element.name +'</dd>';
-                      });
-                      tracksSource += '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">'+ track_duration +'</dd>' +
-                      '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">'+ track_explicit +'</dd>' +
-                      '</dl>' +
-                      '</div>' +
-                      '</div>';
-                      var tracksTemplate = Handlebars.compile(tracksSource),
-                          tracksPlaceholder = document.getElementById('tracks');
-                          tracksPlaceholder.innerHTML = tracksTemplate({});
-                      $(".track-container").mousedown( function() {
-                            play($(this).attr("trackURI"));
-                      })
-                    }
-                  }); 
+                var image_url = response.album.images[1].url;
+                var track_uri = response.uri;
+                var track_name = response.name;
+                var track_artists = response.artists;
+                var track_duration = duration;
+                var track_explicit = explicit;
+                tracksSource += '<div class="track-container"' +
+                  'trackURI="' + track_uri + '">' +
+                  '<img class="track-image" src="' + image_url + '">' +
+                  '<div class="track-details">' +
+                  '<dl>' +
+                  '<dt class="track-details-dt">Name</dt><dd class="track-details-dd">' + track_name + '</dd>' +
+                  '<dt class="track-details-dt">Artists</dt>';
+                track_artists.forEach(element => {
+                  tracksSource += '<dd class="track-details-dd">' + element.name + '</dd>';
                 });
-              } 
-              setTimeout(updateFavTracks, 2000);
-            }
+                tracksSource += '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">' + track_duration + '</dd>' +
+                  '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">' + track_explicit + '</dd>' +
+                  '</dl>' +
+                  '</div>' +
+                  '</div>';
+                var tracksTemplate = Handlebars.compile(tracksSource),
+                  tracksPlaceholder = document.getElementById('tracks');
+                tracksPlaceholder.innerHTML = tracksTemplate({});
+                $(".track-container").mousedown(function () {
+                  play($(this).attr("trackURI"));
+                })
+              }
+            });
+          });
+        }
+        setTimeout(updateFavTracks, 2000);
+      }
 
-        // var oauthSource = document.getElementById('oauth-template').innerHTML,
-        //     oauthTemplate = Handlebars.compile(oauthSource),
-        //     oauthPlaceholder = document.getElementById('oauth');
+      // var oauthSource = document.getElementById('oauth-template').innerHTML,
+      //     oauthTemplate = Handlebars.compile(oauthSource),
+      //     oauthPlaceholder = document.getElementById('oauth');
 
-        var msToMin = function(millis) {
-          var minutes = Math.floor(millis / 60000);
-          var seconds = ((millis % 60000) / 1000).toFixed(0);
-          return minutes + ":" + (seconds < 10 ? "0" : "") + seconds
+      var msToMin = function (millis) {
+        var minutes = Math.floor(millis / 60000);
+        var seconds = ((millis % 60000) / 1000).toFixed(0);
+        return minutes + ":" + (seconds < 10 ? "0" : "") + seconds
+      }
+
+      var params = getHashParams();
+
+      var access_token = params.access_token,
+        refresh_token = params.refresh_token,
+        error = params.error;
+
+      if (error) {
+        alert('There was an error during the authentication');
+      } else {
+        if (access_token) {
+          // render oauth info
+          // oauthPlaceholder.innerHTML = oauthTemplate({
+          //   access_token: access_token,
+          //   refresh_token: refresh_token
+          // });
+
+          searchForSong();
+          updateDevices();
+          updateFavTracks();
+
+          //take them to the main screen
+          $('#login').hide();
+          $('#loggedin').show();
+        } else {
+          // render initial screen
+          $('#login').show();
+          $('#loggedin').hide();
         }
 
-        var params = getHashParams();
-
-        var access_token = params.access_token,
-            refresh_token = params.refresh_token,
-            error = params.error;
-
-        if (error) {
-          alert('There was an error during the authentication');
-        } else {
-          if (access_token) {
-            // render oauth info
-            // oauthPlaceholder.innerHTML = oauthTemplate({
-            //   access_token: access_token,
-            //   refresh_token: refresh_token
-            // });
-            
-            searchForSong();
-            updateDevices();
-            updateFavTracks();
-            
-            //take them to the main screen
-            $('#login').hide();
-            $('#loggedin').show();
-          } else {
-              // render initial screen
-              $('#login').show();
-              $('#loggedin').hide();
-          }
-
-          play = function(track = "", start_time = 0) {
-            var url = 'https://api.spotify.com/v1/me/player/play';
-            if(track === "") {
-              $.ajax({
+        play = function (track = "", start_time = 0) {
+          var url = 'https://api.spotify.com/v1/me/player/play';
+          if (track === "") {
+            $.ajax({
               url: url,
               method: 'PUT',
               headers: {
@@ -382,7 +385,7 @@
               success: function (response) {
               }
             });
-            } else {
+          } else {
             $.ajax({
               url: url,
               method: 'PUT',
@@ -398,42 +401,42 @@
               success: function (response) {
               }
             });
-            }
           }
-
-          // document.getElementById('obtain-new-token').addEventListener('click', function() {
-          //   $.ajax({
-          //     url: '/refresh_token',
-          //     data: {
-          //       'refresh_token': refresh_token
-          //     }
-          //   }).done(function(data) {
-          //     access_token = data.access_token;
-          //     oauthPlaceholder.innerHTML = oauthTemplate({
-          //       access_token: access_token,
-          //       refresh_token: refresh_token
-          //     });
-          //   });
-          // }, false);
-          
-          document.getElementById('pause').addEventListener('click', function() {
-              $.ajax({
-              url: 'https://api.spotify.com/v1/me/player/pause',
-              type: 'PUT',
-              headers: {
-                'Authorization': 'Bearer ' + access_token
-              },
-              success: function(response) {
-              }
-            });
-          });
-          //FINALLY FUCKING WORKS!
-          document.getElementById('play').addEventListener('click', function () {
-            play();
-          });
         }
-      })();
-    </script>
-  </body>
-</html>
 
+        // document.getElementById('obtain-new-token').addEventListener('click', function() {
+        //   $.ajax({
+        //     url: '/refresh_token',
+        //     data: {
+        //       'refresh_token': refresh_token
+        //     }
+        //   }).done(function(data) {
+        //     access_token = data.access_token;
+        //     oauthPlaceholder.innerHTML = oauthTemplate({
+        //       access_token: access_token,
+        //       refresh_token: refresh_token
+        //     });
+        //   });
+        // }, false);
+
+        document.getElementById('pause').addEventListener('click', function () {
+          $.ajax({
+            url: 'https://api.spotify.com/v1/me/player/pause',
+            type: 'PUT',
+            headers: {
+              'Authorization': 'Bearer ' + access_token
+            },
+            success: function (response) {
+            }
+          });
+        });
+        //FINALLY FUCKING WORKS!
+        document.getElementById('play').addEventListener('click', function () {
+          play();
+        });
+      }
+    })();
+  </script>
+</body>
+
+</html>
