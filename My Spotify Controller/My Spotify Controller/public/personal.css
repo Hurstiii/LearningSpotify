@@ -2,6 +2,14 @@ body {
     background: rgba(0,0,0,0.9);
 }
 
+.btn-default {
+    margin: 10px;
+}
+
+#playback {
+    border-top: 2px solid rgba(0,0,0,0.9);
+}
+
 .container {
     background: white;
     border-bottom-left-radius: 20px;

@@ -30,6 +30,10 @@
       <div id="loggedin">
         <div id="devices">
         </div>
+        <div id="playback">
+          <button class="btn btn-default" id="play">Play</button>
+          <button class="btn btn-default" id="pause">Pause</button>
+        </div>
         <div id="tracks">
         </div>
         <div id="search-outer-container">
@@ -41,11 +45,9 @@
           <div id="song-search-results">
           </div>
         </div>
-        <div id="oauth">
-        </div>
-        <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
-        <button class="btn btn-default" id="play">Play</button>
-        <button class="btn btn-default" id="pause">Pause</button>
+        <!-- <div id="oauth">
+        </div> -->
+        <!-- <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button> -->
       </div>
     </div>
 
@@ -60,13 +62,13 @@
     <script id="results-template" type="text/x-handlebars-template">
     </script>
 
-    <script id="oauth-template" type="text/x-handlebars-template">
+    <!-- <script id="oauth-template" type="text/x-handlebars-template">
       <h2>oAuth info</h2>
       <dl class="dl-horizontal">
         <dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
         <dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}</dd>
       </dl>
-    </script>
+    </script> -->
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
@@ -146,8 +148,35 @@
                     var resultsTemplate = Handlebars.compile(resultsSource),
                         resultsPlaceholder = document.getElementById('song-search-results');
                         resultsPlaceholder.innerHTML = resultsTemplate({});
-                    $(".remove-from-fav-btn").hide();
-                    $(".track-container").mousedown(function() {
+                    // if(!((trackList.find(element => {
+                    //       return  === element
+                    //     })) === undefined)) {
+                    //       $(".remove-from-fav-btn").show();
+                    //       $(".add-to-fav-btn").hide();
+                    //     } else {
+                    //       $(".remove-from-fav-btn").hide();
+                    //       $(".add-to-fav-btn").show();
+                    //     }
+                    $("#song-search-results .track-container").each(function(index) {
+                    //console.log($(".track-container"));
+                    // console.log("Hello");
+                    var uri = $(this).attr("trackURI");
+                    var element = $(this);
+                    uri = uri.slice(14);
+                    //console.log(uri);
+                    if(!((trackList.find(match => {
+                        return uri === match
+                      })) === undefined)) {
+                        element.parent().children(".track-options").children(".add-to-fav-btn").hide();
+                        element.parent().children(".track-options").children(".remove-from-fav-btn").show();
+                      } else {
+                        element.parent().children(".track-options").children(".add-to-fav-btn").show();
+                        element.parent().children(".track-options").children(".remove-from-fav-btn").hide();
+                      }
+                    });   
+                        
+                    
+                    $("#song-search-results .track-container").mousedown(function() {
                         play($(this).attr("trackURI"));
                     });
                     $(".add-to-fav-btn").mousedown(function() {
@@ -179,7 +208,8 @@
                   });
                 } 
               });
-            } else {
+              // 6rPO02ozF3bM7NnOV4h6s2
+                } else {
               var resultsSource = document.getElementById("results-template").innerHTML,
                     resultsTemplate = Handlebars.compile(resultsSource),
                     resultsPlaceholder = document.getElementById('song-search-results');
@@ -187,7 +217,7 @@
             }
           }
           currentKeyword = keyword;
-          setTimeout(searchForSong, 2000);
+          setTimeout(searchForSong, 500);
         }
 
 /*
@@ -301,9 +331,9 @@
               setTimeout(updateFavTracks, 2000);
             }
 
-        var oauthSource = document.getElementById('oauth-template').innerHTML,
-            oauthTemplate = Handlebars.compile(oauthSource),
-            oauthPlaceholder = document.getElementById('oauth');
+        // var oauthSource = document.getElementById('oauth-template').innerHTML,
+        //     oauthTemplate = Handlebars.compile(oauthSource),
+        //     oauthPlaceholder = document.getElementById('oauth');
 
         var msToMin = function(millis) {
           var minutes = Math.floor(millis / 60000);
@@ -322,10 +352,10 @@
         } else {
           if (access_token) {
             // render oauth info
-            oauthPlaceholder.innerHTML = oauthTemplate({
-              access_token: access_token,
-              refresh_token: refresh_token
-            });
+            // oauthPlaceholder.innerHTML = oauthTemplate({
+            //   access_token: access_token,
+            //   refresh_token: refresh_token
+            // });
             
             searchForSong();
             updateDevices();
@@ -371,20 +401,20 @@
             }
           }
 
-          document.getElementById('obtain-new-token').addEventListener('click', function() {
-            $.ajax({
-              url: '/refresh_token',
-              data: {
-                'refresh_token': refresh_token
-              }
-            }).done(function(data) {
-              access_token = data.access_token;
-              oauthPlaceholder.innerHTML = oauthTemplate({
-                access_token: access_token,
-                refresh_token: refresh_token
-              });
-            });
-          }, false);
+          // document.getElementById('obtain-new-token').addEventListener('click', function() {
+          //   $.ajax({
+          //     url: '/refresh_token',
+          //     data: {
+          //       'refresh_token': refresh_token
+          //     }
+          //   }).done(function(data) {
+          //     access_token = data.access_token;
+          //     oauthPlaceholder.innerHTML = oauthTemplate({
+          //       access_token: access_token,
+          //       refresh_token: refresh_token
+          //     });
+          //   });
+          // }, false);
           
           document.getElementById('pause').addEventListener('click', function() {
               $.ajax({
