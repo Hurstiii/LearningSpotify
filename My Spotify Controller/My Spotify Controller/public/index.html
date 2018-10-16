@@ -48,30 +48,26 @@
         <div id="song-search-results">
         </div>
       </div>
-      <!-- <div id="oauth">
-        </div> -->
       <!-- <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button> -->
     </div>
   </div>
-
+  <!-- 
+    Handlebars template for devices
+  -->
   <script id="devices-template" type="text/x-handlebars-template">
-      <h2>Devices: {{device_count}}</h2>
-    </script>
-
+    <h2>Devices: {{device_count}}</h2>
+  </script>
+  <!-- 
+    Handlebars template for devices
+  -->
   <script id="tracks-template" type="text/x-handlebars-template">
-      <h2>Favourite Tracks</h2>
-    </script>
-
+    <h2>Favourite Tracks</h2>
+  </script>
+  <!-- 
+    Handlebars template for devices
+  -->
   <script id="results-template" type="text/x-handlebars-template">
-    </script>
-
-  <!-- <script id="oauth-template" type="text/x-handlebars-template">
-      <h2>oAuth info</h2>
-      <dl class="dl-horizontal">
-        <dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
-        <dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}</dd>
-      </dl>
-    </script> -->
+  </script>
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
@@ -92,15 +88,14 @@
         return hashParams;
       }
 
-
-      /*
-      *------------------------------------------------------------------------------------------------------------------
-      * Handles the searching and presenting of the songs using the 
-      *   @param keyword from the 
-      *   @input searchbar
-      *
-      */
+      /**
+       * --------------------------------------------------------------------------------------------------------------------------------------------------
+       * Handles the searching and presenting of the songs using the 
+       * @param keyword from the 
+       * @input searchbar
+       */
       var currentKeyword = ""
+
       function searchForSong() {
         var keyword = document.getElementById("song-searchbar").value;
         if (!(keyword === currentKeyword)) {
@@ -128,48 +123,40 @@
                   var track_artists = element.artists;
                   var track_duration = duration;
                   var track_explicit = explicit;
-                  resultsSource += '<div class="track-outer-container">';
-                  resultsSource += '<div class="track-container"' +
-                    'trackURI="' + track_uri + '">' +
+                  resultsSource += '<div class="track-outer-container">' + ;
+                  '<div class="track-container"' +
+                  'trackURI="' + track_uri + '">' +
                     '<img class="track-image" src="' + image_url + '">' +
                     '<div class="track-details">' +
                     '<dl>' +
-                    '<dt class="track-details-dt">Name</dt><dd class="track-details-dd">' + track_name + '</dd>' +
+                    '<dt class="track-details-dt">Name</dt><dd class="track-details-dd">' + track_name +
+                    '</dd>' +
                     '<dt class="track-details-dt">Artists</dt>';
                   track_artists.forEach(element => {
                     resultsSource += '<dd class="track-details-dd">' + element.name + '</dd>';
                   });
-                  resultsSource += '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">' + track_duration + '</dd>' +
-                    '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">' + track_explicit + '</dd>' +
+                  resultsSource +=
+                    '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">' +
+                    track_duration + '</dd>' +
+                    '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">' +
+                    track_explicit + '</dd>' +
                     '</dl>' +
                     '</div>' +
-                    '</div>'
-                  resultsSource += '<div class="track-options">' +
+                    '</div>' +
+                    '<div class="track-options">' +
                     '<button class="add-to-fav-btn">' +
                     '<button class="remove-from-fav-btn">' +
                     '</div></div>';
                   var resultsTemplate = Handlebars.compile(resultsSource),
                     resultsPlaceholder = document.getElementById('song-search-results');
                   resultsPlaceholder.innerHTML = resultsTemplate({});
-                  // if(!((trackList.find(element => {
-                  //       return  === element
-                  //     })) === undefined)) {
-                  //       $(".remove-from-fav-btn").show();
-                  //       $(".add-to-fav-btn").hide();
-                  //     } else {
-                  //       $(".remove-from-fav-btn").hide();
-                  //       $(".add-to-fav-btn").show();
-                  //     }
                   $("#song-search-results .track-container").each(function (index) {
-                    //console.log($(".track-container"));
-                    // console.log("Hello");
                     var uri = $(this).attr("trackURI");
                     var element = $(this);
                     uri = uri.slice(14);
-                    //console.log(uri);
                     if (!((trackList.find(match => {
-                      return uri === match
-                    })) === undefined)) {
+                        return uri === match
+                      })) === undefined)) {
                       element.parent().children(".track-options").children(".add-to-fav-btn").hide();
                       element.parent().children(".track-options").children(".remove-from-fav-btn").show();
                     } else {
@@ -186,8 +173,8 @@
                     var uri = $(this).parent().siblings().attr("trackURI");
                     uri = uri.slice(14);
                     if ((trackList.find(element => {
-                      return uri === element
-                    })) === undefined) {
+                        return uri === element
+                      })) === undefined) {
                       trackList.push(uri);
                       $(this).hide();
                       $(this).siblings(".remove-from-fav-btn").show();
@@ -199,8 +186,8 @@
                     var uri = $(this).parent().siblings().attr("trackURI");
                     uri = uri.slice(14);
                     if (!((trackList.find(element => {
-                      return uri === element
-                    })) === undefined)) {
+                        return uri === element
+                      })) === undefined)) {
                       trackList.splice(trackList.indexOf(uri), 1);
                       $(this).hide();
                       $(this).siblings(".add-to-fav-btn").show();
@@ -211,7 +198,6 @@
                 });
               }
             });
-            // 6rPO02ozF3bM7NnOV4h6s2
           } else {
             var resultsSource = document.getElementById("results-template").innerHTML,
               resultsTemplate = Handlebars.compile(resultsSource),
@@ -223,11 +209,10 @@
         setTimeout(searchForSong, 500);
       }
 
-      /*
-      *------------------------------------------------------------------------------------------------------------------
-      * Updates the devices listed in real-time/without a refresh
-      *
-      */
+      /**
+       * ---------------------------------------------------------------------------------------------------------------------------------------------------
+       * Updates the devices listed in real-time/without a refresh
+       */
       function updateDevices() {
         $.ajax({
           url: 'https://api.spotify.com/v1/me/player/devices',
@@ -243,11 +228,16 @@
             var devicesSource = document.getElementById("devices-template").innerHTML;
             devicesSource += '<dl class="dl-horizontal">';
             devices.forEach((element, index) => {
-              devicesSource += '<div class="device-container" id="device-' + index + '"><div class="device-details-container"><dt>Device Name</dt><dd id="device-name" class="text-overflow">' + element.name + '</dd>' +
+              devicesSource += '<div class="device-container" id="device-' + index +
+                '"><div class="device-details-container"><dt>Device Name</dt><dd id="device-name" class="text-overflow">' +
+                element.name + '</dd>' +
                 '<dt>id</dt><dd id="device-id" class="text-overflow">' + element.id + '</dd>' +
                 '<dt>type</dt><dd id="device-type" class="text-overflow">' + element.type + '</dd>' +
-                '<dt>is_active</dt><dd id="device-active" class="text-overflow">' + element.is_active + '</dd>' +
-                '<dd><button class="btn btn-default" id="devices-sel" device-id="' + element.id + '">Select</button></dd></div><img id="devices-image" src="' + imageTypes[element.type] + '" height="114px"></div> <br>';
+                '<dt>is_active</dt><dd id="device-active" class="text-overflow">' + element.is_active +
+                '</dd>' +
+                '<dd><button class="btn btn-default" id="devices-sel" device-id="' + element.id +
+                '">Select</button></dd></div><img id="devices-image" src="' + imageTypes[element.type] +
+                '" height="114px"></div> <br>';
             });
             devicesSource += '</dl>';
             //compile and inject the devices template into the main html body
@@ -268,8 +258,7 @@
                 data: JSON.stringify({ //!Have to use JSON.stringify in order to send the data as a JSON object which the endpoint expects.
                   "device_ids": [id]
                 }),
-                success: function (response) {
-                }
+                success: function (response) {}
               });
             });
           }
@@ -277,15 +266,17 @@
         setTimeout(updateDevices, 5000);
       }
 
-
-      /*
-      *----------------------------------------------------------------------------------------------------------------------------------------------------
-      * Update Favourite Tracks Section
-      * presents all the tracks in the trackslist into the favorite tracks section of the page
-      */
+      /**
+       * ----------------------------------------------------------------------------------------------------------------------------------------------------
+       * * purpose: update favourite tracks section
+       * * presents all the tracks in the trackslist into the favorite tracks section of the page
+       */
       // Holds the uri's of the songs that are to presented in the favourite songs section
-      var trackList = ["6rPO02ozF3bM7NnOV4h6s2", "0Sayb1EWTywPttwJo7zjBt", "3EPXxR3ImUwfayaurPi3cm", "2WwzQJt4hG7YC6x16ZTYFM", "6mcxQ1Y3uQRU0IHsvdNLH1"]
+      var trackList = ["6rPO02ozF3bM7NnOV4h6s2", "0Sayb1EWTywPttwJo7zjBt", "3EPXxR3ImUwfayaurPi3cm",
+        "2WwzQJt4hG7YC6x16ZTYFM", "6mcxQ1Y3uQRU0IHsvdNLH1"
+      ]
       var track_list_length = 0;
+
       function updateFavTracks() {
         if (!(trackList.length === track_list_length)) {
           track_list_length = trackList.length;
@@ -311,13 +302,16 @@
                   '<img class="track-image" src="' + image_url + '">' +
                   '<div class="track-details">' +
                   '<dl>' +
-                  '<dt class="track-details-dt">Name</dt><dd class="track-details-dd">' + track_name + '</dd>' +
+                  '<dt class="track-details-dt">Name</dt><dd class="track-details-dd">' + track_name +
+                  '</dd>' +
                   '<dt class="track-details-dt">Artists</dt>';
                 track_artists.forEach(element => {
                   tracksSource += '<dd class="track-details-dd">' + element.name + '</dd>';
                 });
-                tracksSource += '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">' + track_duration + '</dd>' +
-                  '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">' + track_explicit + '</dd>' +
+                tracksSource += '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">' +
+                  track_duration + '</dd>' +
+                  '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">' +
+                  track_explicit + '</dd>' +
                   '</dl>' +
                   '</div>' +
                   '</div>';
@@ -334,10 +328,42 @@
         setTimeout(updateFavTracks, 2000);
       }
 
-      // var oauthSource = document.getElementById('oauth-template').innerHTML,
-      //     oauthTemplate = Handlebars.compile(oauthSource),
-      //     oauthPlaceholder = document.getElementById('oauth');
+      /**
+       * ----------------------------------------------------------------------------------------------------------------------------------------------------
+       * * purpose: play a song
+       * use @param track to specify the new track to play
+       * can also use @param start_time to specify a time to skip to
+       */
+      function play(track = "", start_time = 0) {
+        var url = 'https://api.spotify.com/v1/me/player/play';
+        if (track === "") {
+          $.ajax({
+            url: url,
+            method: 'PUT',
+            headers: {
+              'authorization': 'Bearer ' + access_token,
+            },
+            success: function (response) {}
+          });
+        } else {
+          $.ajax({
+            url: url,
+            method: 'PUT',
+            dataType: 'json',
+            contentType: false,
+            data: JSON.stringify({ //!Have to use JSON.stringify in order to send the data as a JSON object which the endpoint expects.
+              "uris": [track],
+              "position_ms": start_time
+            }),
+            headers: {
+              'authorization': 'Bearer ' + access_token,
+            },
+            success: function (response) {}
+          });
+        }
+      }
 
+      // this function converts milliseconds into standard minutes:seconds format 
       var msToMin = function (millis) {
         var minutes = Math.floor(millis / 60000);
         var seconds = ((millis % 60000) / 1000).toFixed(0);
@@ -350,75 +376,44 @@
         refresh_token = params.refresh_token,
         error = params.error;
 
+      // end of  function delcarations and general variable declarations
       if (error) {
         alert('There was an error during the authentication');
       } else {
         if (access_token) {
-          // render oauth info
-          // oauthPlaceholder.innerHTML = oauthTemplate({
-          //   access_token: access_token,
-          //   refresh_token: refresh_token
-          // });
-
+          /**
+           * * start of active section, 
+           * * executed just before the logged in page loads
+           */
           searchForSong();
           updateDevices();
           updateFavTracks();
+          /** 
+           * * end of the after section
+           */
 
           //take them to the main screen
           $('#login').hide();
           $('#loggedin').show();
+          /**
+           * * executed after the screen has loaded
+           */
+
+          /** 
+           * * end of the after section
+           */
         } else {
           // render initial screen
           $('#login').show();
           $('#loggedin').hide();
         }
+        /**
+         * * executed regardless of if there is an access code or not
+         */
 
-        play = function (track = "", start_time = 0) {
-          var url = 'https://api.spotify.com/v1/me/player/play';
-          if (track === "") {
-            $.ajax({
-              url: url,
-              method: 'PUT',
-              headers: {
-                'authorization': 'Bearer ' + access_token,
-              },
-              success: function (response) {
-              }
-            });
-          } else {
-            $.ajax({
-              url: url,
-              method: 'PUT',
-              dataType: 'json',
-              contentType: false,
-              data: JSON.stringify({ //!Have to use JSON.stringify in order to send the data as a JSON object which the endpoint expects.
-                "uris": [track],
-                "position_ms": start_time
-              }),
-              headers: {
-                'authorization': 'Bearer ' + access_token,
-              },
-              success: function (response) {
-              }
-            });
-          }
-        }
-
-        // document.getElementById('obtain-new-token').addEventListener('click', function() {
-        //   $.ajax({
-        //     url: '/refresh_token',
-        //     data: {
-        //       'refresh_token': refresh_token
-        //     }
-        //   }).done(function(data) {
-        //     access_token = data.access_token;
-        //     oauthPlaceholder.innerHTML = oauthTemplate({
-        //       access_token: access_token,
-        //       refresh_token: refresh_token
-        //     });
-        //   });
-        // }, false);
-
+        /**
+         * * adding eventlistners for clicking the play and pause buttons
+         */
         document.getElementById('pause').addEventListener('click', function () {
           $.ajax({
             url: 'https://api.spotify.com/v1/me/player/pause',
@@ -426,11 +421,9 @@
             headers: {
               'Authorization': 'Bearer ' + access_token
             },
-            success: function (response) {
-            }
+            success: function (response) {}
           });
         });
-        //FINALLY FUCKING WORKS!
         document.getElementById('play').addEventListener('click', function () {
           play();
         });
