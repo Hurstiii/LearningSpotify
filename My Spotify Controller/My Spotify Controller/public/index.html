@@ -25,27 +25,43 @@
     <img src="logo.png">
     <h1>Learning Spotify</h1>
   </div>
-  <div class="container">
+  <div class="outer-container">
     <div id="login">
       <h1>This is an example of the Authorization Code flow</h1>
       <a href="/login" class="btn btn-primary">Log in with Spotify</a>
     </div>
     <div id="loggedin">
-      <div id="devices">
-      </div>
-      <div id="playback">
-        <button class="btn btn-default" id="play">Play</button>
-        <button class="btn btn-default" id="pause">Pause</button>
-      </div>
-      <div id="tracks">
-      </div>
-      <div id="search-outer-container">
-        <h2 id="searchbar-title">Search</h2>
-        <div id="searchbar-container">
-          <img id="searchbar-image" src="magnifying glass.png">
-          <input id="song-searchbar" type="search" placeholder="Search">
+      <div class="side-bar-container" id="left">
+        <div class="side-bar" id="left-side-bar">
+          <div id="devices">
+          </div>
+          <div id="playback">
+            <button class="btn btn-default" id="play">Play</button>
+            <button class="btn btn-default" id="pause">Pause</button>
+          </div>
         </div>
-        <div id="song-search-results">
+      </div>
+      <div class="right-hand-side">
+        <div class="container">
+          <div id="tracks">
+          </div>
+          <div id="search-outer-container">
+            <h2 id="searchbar-title">Search</h2>
+            <div id="searchbar-container">
+              <img id="searchbar-image" src="magnifying glass.png">
+              <input id="song-searchbar" type="search" placeholder="Search">
+            </div>
+            <div id="song-search-results">
+            </div>
+          </div>
+        </div>
+        <div class="side-bar-container" id="right">
+          <div class="side-bar" id="right-side-bar">
+            <div class="queue-container">
+              <div id="queue">
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -66,6 +82,10 @@
     Handlebars template for devices
   -->
   <script id="results-template" type="text/x-handlebars-template">
+  </script>
+
+  <script id="queue-template" type="text/x-handlebars-template">
+    <h4>Queue</h4>
   </script>
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
@@ -94,6 +114,54 @@
        * @input searchbar
        */
       var currentKeyword = ""
+
+      var queueList = ["6rPO02ozF3bM7NnOV4h6s2"]
+      var queue_list_length = 0;
+
+      function updateQueue() {
+        if (!(queueList.length === queue_list_length)) {
+          queue_list_length = queueList.length;
+          var queueSource = document.getElementById("queue-template").innerHTML
+          queueList.forEach((element) => {
+            $.ajax({
+              url: "https://api.spotify.com/v1/tracks/" + element,
+              headers: {
+                'Authorization': 'Bearer ' + access_token
+              },
+              success: function (response) {
+                var duration = msToMin(response.duration_ms);
+
+                var track_uri = response.uri;
+                var track_name = response.name;
+                var track_artists = response.artists;
+                var track_duration = duration;
+                queueSource += '<div class="song-queue-element"' +
+                  'trackURI="' + track_uri + '">' +
+                  '<div class="element-vote-counter">1</div>' +
+                  '<div class="queue-element-button-container">' +
+                  '<button class="upvote vote-btn"></button>' +
+                  '<button class="downvote vote-btn"></button>' +
+                  '</div>' +
+                  '<div class="queue-element-details">' +
+                  '<div class="queue-element-name">' + response.name + '</div>' +
+                  '<div class="queue-element-duration">' + duration + '</div>' +
+                  '</div>' +
+                  '</div>';
+                var queueTemplate = Handlebars.compile(queueSource),
+                  queuePlaceholder = document.getElementById('queue');
+                queuePlaceholder.innerHTML = queueTemplate({});
+                
+                // $(".upvote").mousedown(function() {
+                //   var counter = $(this).parent().siblings(".element-vote-counter");
+                //   var current_count = parseInt(counter.attr("counter"));
+                //   counter.attr("counter", ("" + (++current_count)));
+                // });
+              }
+            });
+          });
+        }
+        setTimeout(updateQueue, 2000);
+      }
 
       function searchForSong() {
         var keyword = document.getElementById("song-searchbar").value;
@@ -226,18 +294,18 @@
             imageTypes["Smartphone"] = "smart phone big.png";
             imageTypes["Speaker"] = "speaker big.png";
             var devicesSource = document.getElementById("devices-template").innerHTML;
-            devicesSource += '<dl class="dl-horizontal">';
+            devicesSource += '<dl>';
             devices.forEach((element, index) => {
               devicesSource += '<div class="device-container" id="device-' + index +
-                '"><div class="device-details-container"><dt>Device Name</dt><dd id="device-name" class="text-overflow">' +
+                '"><div class="device-details-container"><dt>Device Name</dt><dd id="device-name">' +
                 element.name + '</dd>' +
-                '<dt>id</dt><dd id="device-id" class="text-overflow">' + element.id + '</dd>' +
-                '<dt>type</dt><dd id="device-type" class="text-overflow">' + element.type + '</dd>' +
-                '<dt>is_active</dt><dd id="device-active" class="text-overflow">' + element.is_active +
+                '<dt>id</dt><dd id="device-id">' + element.id + '</dd>' +
+                '<dt>type</dt><dd id="device-type">' + element.type + '</dd>' +
+                '<dt>is_active</dt><dd id="device-active">' + element.is_active +
                 '</dd>' +
-                '<dd><button class="btn btn-default" id="devices-sel" device-id="' + element.id +
-                '">Select</button></dd></div><img id="devices-image" src="' + imageTypes[element.type] +
-                '" height="114px"></div> <br>';
+                '<dd><img id="devices-image" src="' + imageTypes[element.type] +
+                '"><button class="btn btn-default" id="devices-sel" device-id="' + element.id +
+                '">Select</button></dd></div></div> <br>';
             });
             devicesSource += '</dl>';
             //compile and inject the devices template into the main html body
@@ -263,7 +331,7 @@
             });
           }
         });
-        setTimeout(updateDevices, 5000);
+        //setTimeout(updateDevices, 5000);
       }
 
       /**
@@ -388,6 +456,7 @@
           searchForSong();
           updateDevices();
           updateFavTracks();
+          updateQueue();
           /** 
            * * end of the before section
            */

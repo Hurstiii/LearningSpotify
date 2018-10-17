@@ -11,11 +11,18 @@ body {
 }
 
 .container {
+    max-width: 1300px;
+    min-width: 1000px;
     background: white;
     box-shadow: 0px 0px 20px 10px black;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
     padding-bottom: 10px;
+    display: inline-block;
+}
+
+.right-hand-side {
+    min-width: 2000px;
 }
 
 .navbar-p {
@@ -28,7 +35,7 @@ body {
     margin-bottom: 5px;
     color: white;
     padding: 5px;
-    z-index: 1;
+    z-index: 10;
     display: inline-block;
     width: 100%;
 }
@@ -47,26 +54,155 @@ body {
     display: inline-block;
 }
 
+.side-bar-container {
+    display: inline-block;
+}
+
+.side-bar-container#left {
+    width: 300px;
+    min-height: 100px;
+    float: left;
+}
+
+.side-bar-container#right {
+    margin-left: 50px;
+    min-height: 100px;
+    vertical-align: top;
+}
+
+.side-bar {
+    position: fixed;
+    top: 73px;
+    background: white;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 10px;
+    font-size: 1em;
+    box-shadow: 0px 0px 20px 10px black;
+    z-index: 1;
+}
+
+
+#left-side-bar {
+    left: 0;
+}
+
+#right-side-bar {
+    position: relative;
+    top: 10px;
+    border-radius: 10px;
+}
+
+.queue-container {
+    margin-left: 10px;
+    margin-top: 10px;
+    color: black;
+}
+
+.song-queue-element {
+    display: block;
+    position: relative;
+}
+
+.queue-element-details {
+    vertical-align: middle;
+    margin-left: 10px;
+    display: inline-block;
+}
+
+.queue-element-button-container {
+    display: inline-block;
+    vertical-align: middle;
+    margin-top: 8px;
+}
+
+.vote-btn {
+    display: block;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin: 0;
+    border: none;
+}
+
+.vote-btn:focus {
+    outline: none;
+
+}
+
+.upvote {
+    background: none;
+    background-size: contain;
+    background-image: url("upvote-style-arrow.png");
+    margin-bottom: 5px;
+}
+
+.downvote {
+    background: none;
+    background-size: contain;
+    background-image: url("downvote-style-arrow.png");
+}
+
+.element-vote-counter {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.queue-element-name {
+    display: inline-block;
+    margin-right: 5px;
+    min-width: 200px;
+}
+
+.queue-element-duration {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.song-queue-element {
+    border-top: 2px solid black;
+    margin-top: 8px;
+}
+
 #devices {
     background: rgba(255,255,255,0.9);
-    padding-left: 20px;
-    padding-top: 10px;
+    margin-left: 10px;
     margin-top: 10px;
-    margin-bottom: 10px;
     color: black;
-    border-top: 2px solid rgba(0,0,0,0.9);
 }
 
 #devices h2 {
+    font-size: 20px;
     margin: 0;
 }
 
 #devices-image {
+    width: 30px;
+    object-fit: contain;
     float: left;
 }
 
 .device-details-container {
     display: inline-block;
+    width: 100%;
+}
+
+.device-details-container dd {
+    margin: 2px;
+}
+
+#device-id {
+    font-size: 0.8em;
+    width: inherit;
+    overflow-wrap: break-word;
+}
+
+.device-details-container button {
+    transform: scale(0.8);
+}
+
+#devices dl {
+    margin: 0px;
 }
 
 #search-outer-container {
@@ -97,7 +233,7 @@ body {
 
 #song-searchbar {
     display: inline-block;
-    width: 885px;
+    width: 95%;
     background: none;
     color: black;
     border: none;
@@ -121,7 +257,6 @@ body {
     height: 410px;
     white-space: nowrap;
     margin-bottom: 10px;
-    border-top: 2px solid rgba(0,0,0,0.9);
 }
 
 #tracks::-webkit-scrollbar {
