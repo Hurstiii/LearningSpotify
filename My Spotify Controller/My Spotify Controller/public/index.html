@@ -122,9 +122,9 @@
                   var track_artists = element.artists;
                   var track_duration = duration;
                   var track_explicit = explicit;
-                  resultsSource += '<div class="track-outer-container">' + 
-                  '<div class="track-container"' +
-                  'trackURI="' + track_uri + '">' +
+                  resultsSource += '<div class="track-outer-container">' +
+                    '<div class="track-container"' +
+                    'trackURI="' + track_uri + '">' +
                     '<img class="track-image" src="' + image_url + '">' +
                     '<div class="track-details">' +
                     '<dl>' +
@@ -134,7 +134,8 @@
                   track_artists.forEach(element => {
                     resultsSource += '<dd class="track-details-dd">' + element.name + '</dd>';
                   });
-                  resultsSource += '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">' +
+                  resultsSource +=
+                    '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">' +
                     track_duration + '</dd>' +
                     '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">' +
                     track_explicit + '</dd>' +
@@ -163,10 +164,10 @@
                     }
                   });
 
-
                   $("#song-search-results .track-container").mousedown(function () {
                     play($(this).attr("trackURI"));
                   });
+
                   $(".add-to-fav-btn").mousedown(function () {
                     var uri = $(this).parent().siblings().attr("trackURI");
                     uri = uri.slice(14);
@@ -180,6 +181,7 @@
 
                     }
                   });
+
                   $(".remove-from-fav-btn").mousedown(function () {
                     var uri = $(this).parent().siblings().attr("trackURI");
                     uri = uri.slice(14);
