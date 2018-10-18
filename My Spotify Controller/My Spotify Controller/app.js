@@ -14,8 +14,8 @@ var cookieParser = require('cookie-parser');
 
 var client_id = '682465f0ea1a4cf9b23642246a3387c9'; // Your client id
 var client_secret = 'a9e1b79f4b1146eea39a65832cada934'; // Your secret
-//var redirect_uri = 'http://1ddeccf0.ngrok.io/callback/'; // Your redirect uri for hosted using ngrok
-var redirect_uri = 'http://localhost:8888/callback/'; // Your redirect uri for localhost
+var redirect_uri = 'http://1ddeccf0.ngrok.io/callback/'; // Your redirect uri for hosted using ngrok
+//var redirect_uri = 'http://localhost:8888/callback/'; // Your redirect uri for localhost
 
 /**
  * Generates a random string containing numbers and letters
@@ -148,6 +148,36 @@ app.get('/refresh_token', function (req, res) {
     }
   });
 });
+
+ var trackList = ["6rPO02ozF3bM7NnOV4h6s2", "0Sayb1EWTywPttwJo7zjBt", "3EPXxR3ImUwfayaurPi3cm",
+ "2WwzQJt4hG7YC6x16ZTYFM", "6mcxQ1Y3uQRU0IHsvdNLH1"];
+
+app.get('/favouriteTracks', function (req, res) {
+  res.send({
+    'tracks': trackList
+  });
+});
+
+app.get('/favouriteTracks/add', function (req, res) {
+  trackList.push(req.query.track_uri);
+  res.send({});
+});
+
+app.get('/favouriteTracks/remove', function (req, res) {
+  trackList.splice(trackList.indexOf(req.query.track_uri), 1);
+  res.send({});
+});
+
+
+var queue = [{song: "6rPO02ozF3bM7NnOV4h6s2", votes: 1}, 
+             {song: "6mcxQ1Y3uQRU0IHsvdNLH1", votes: 1}];
+app.get('/queue', function (req, res) {
+  res.send({
+    'queue': queue
+  });
+});
+
+
 
 console.log('Listening on 8888');
 app.listen(8888);

@@ -115,51 +115,56 @@
        */
       var currentKeyword = ""
 
-      var queueList = ["6rPO02ozF3bM7NnOV4h6s2"]
       var queue_list_length = 0;
 
       function updateQueue() {
-        if (!(queueList.length === queue_list_length)) {
-          queue_list_length = queueList.length;
-          var queueSource = document.getElementById("queue-template").innerHTML
-          queueList.forEach((element) => {
-            $.ajax({
-              url: "https://api.spotify.com/v1/tracks/" + element,
-              headers: {
-                'Authorization': 'Bearer ' + access_token
-              },
-              success: function (response) {
-                var duration = msToMin(response.duration_ms);
+        $.ajax({
+          url: '/queue',
+          success: response => {
+            queueList = response.queue;
+            if (!(queueList.length === queue_list_length)) {
+              queue_list_length = queueList.length;
+              var queueSource = document.getElementById("queue-template").innerHTML
+              queueList.forEach((element) => {
+                $.ajax({
+                  url: "https://api.spotify.com/v1/tracks/" + element.song,
+                  headers: {
+                    'Authorization': 'Bearer ' + access_token
+                  },
+                  success: function (response) {
+                    var duration = msToMin(response.duration_ms);
 
-                var track_uri = response.uri;
-                var track_name = response.name;
-                var track_artists = response.artists;
-                var track_duration = duration;
-                queueSource += '<div class="song-queue-element"' +
-                  'trackURI="' + track_uri + '">' +
-                  '<div class="element-vote-counter">1</div>' +
-                  '<div class="queue-element-button-container">' +
-                  '<button class="upvote vote-btn"></button>' +
-                  '<button class="downvote vote-btn"></button>' +
-                  '</div>' +
-                  '<div class="queue-element-details">' +
-                  '<div class="queue-element-name">' + response.name + '</div>' +
-                  '<div class="queue-element-duration">' + duration + '</div>' +
-                  '</div>' +
-                  '</div>';
-                var queueTemplate = Handlebars.compile(queueSource),
-                  queuePlaceholder = document.getElementById('queue');
-                queuePlaceholder.innerHTML = queueTemplate({});
-                
-                // $(".upvote").mousedown(function() {
-                //   var counter = $(this).parent().siblings(".element-vote-counter");
-                //   var current_count = parseInt(counter.attr("counter"));
-                //   counter.attr("counter", ("" + (++current_count)));
-                // });
-              }
-            });
-          });
-        }
+                    var track_uri = response.uri;
+                    var track_name = response.name;
+                    var track_artists = response.artists;
+                    var track_duration = duration;
+                    queueSource += '<div class="song-queue-element"' +
+                      'trackURI="' + track_uri + '">' +
+                      '<div class="element-vote-counter">'+element.votes+'</div>' +
+                      '<div class="queue-element-button-container">' +
+                      '<button class="upvote vote-btn"></button>' +
+                      '<button class="downvote vote-btn"></button>' +
+                      '</div>' +
+                      '<div class="queue-element-details">' +
+                      '<div class="queue-element-name">' + response.name + '</div>' +
+                      '<div class="queue-element-duration">' + duration + '</div>' +
+                      '</div>' +
+                      '</div>';
+                    var queueTemplate = Handlebars.compile(queueSource),
+                      queuePlaceholder = document.getElementById('queue');
+                    queuePlaceholder.innerHTML = queueTemplate({});
+
+                    // $(".upvote").mousedown(function() {
+                    //   var counter = $(this).parent().siblings(".element-vote-counter");
+                    //   var current_count = parseInt(counter.attr("counter"));
+                    //   counter.attr("counter", ("" + (++current_count)));
+                    // });
+                  }
+                });
+              });
+            }
+          }
+        });
         setTimeout(updateQueue, 2000);
       }
 
@@ -237,28 +242,44 @@
                   });
 
                   $(".add-to-fav-btn").mousedown(function () {
+                    var add_btn = $(this);
                     var uri = $(this).parent().siblings().attr("trackURI");
                     uri = uri.slice(14);
                     if ((trackList.find(element => {
                         return uri === element
                       })) === undefined) {
-                      trackList.push(uri);
-                      $(this).hide();
-                      $(this).siblings(".remove-from-fav-btn").show();
+                      $.ajax({
+                        url: '/favouriteTracks/add',
+                        data: {
+                          track_uri: uri
+                        },
+                        success: function(response) {
+                          add_btn.hide();
+                          add_btn.siblings(".remove-from-fav-btn").show();
+                        }
+                      });
                     } else {
 
                     }
                   });
 
                   $(".remove-from-fav-btn").mousedown(function () {
+                    var remove_btn = $(this);
                     var uri = $(this).parent().siblings().attr("trackURI");
                     uri = uri.slice(14);
                     if (!((trackList.find(element => {
                         return uri === element
                       })) === undefined)) {
-                      trackList.splice(trackList.indexOf(uri), 1);
-                      $(this).hide();
-                      $(this).siblings(".add-to-fav-btn").show();
+                      $.ajax({
+                        url: '/favouriteTracks/remove',
+                        data: {
+                          track: uri
+                        },
+                        success: function(response) {
+                          remove_btn.hide();
+                          remove_btn.siblings(".add-to-fav-btn").show();
+                        }
+                      });
                     } else {
 
                     }
@@ -340,59 +361,66 @@
        * * presents all the tracks in the trackslist into the favorite tracks section of the page
        */
       // Holds the uri's of the songs that are to presented in the favourite songs section
-      var trackList = ["6rPO02ozF3bM7NnOV4h6s2", "0Sayb1EWTywPttwJo7zjBt", "3EPXxR3ImUwfayaurPi3cm",
-        "2WwzQJt4hG7YC6x16ZTYFM", "6mcxQ1Y3uQRU0IHsvdNLH1"
-      ]
+
+      var trackList = [];
       var track_list_length = 0;
 
       function updateFavTracks() {
-        if (!(trackList.length === track_list_length)) {
-          track_list_length = trackList.length;
-          var tracksSource = document.getElementById("tracks-template").innerHTML
-          trackList.forEach((element) => {
-            $.ajax({
-              url: "https://api.spotify.com/v1/tracks/" + element,
-              headers: {
-                'Authorization': 'Bearer ' + access_token
-              },
-              success: function (response) {
-                var duration = msToMin(response.duration_ms);
-                var explicit = (response.explicit === true) ? "Yes" : "No";
+        $.ajax({
+          url: '/favouriteTracks',
+          success: response => {
+            trackList = response.tracks;
+            if (!(trackList.length === track_list_length)) {
+              track_list_length = trackList.length;
+              var tracksSource = document.getElementById("tracks-template").innerHTML
+              trackList.forEach((element) => {
+                $.ajax({
+                  url: "https://api.spotify.com/v1/tracks/" + element,
+                  headers: {
+                    'Authorization': 'Bearer ' + access_token
+                  },
+                  success: function (response) {
+                    var duration = msToMin(response.duration_ms);
+                    var explicit = (response.explicit === true) ? "Yes" : "No";
 
-                var image_url = response.album.images[1].url;
-                var track_uri = response.uri;
-                var track_name = response.name;
-                var track_artists = response.artists;
-                var track_duration = duration;
-                var track_explicit = explicit;
-                tracksSource += '<div class="track-container"' +
-                  'trackURI="' + track_uri + '">' +
-                  '<img class="track-image" src="' + image_url + '">' +
-                  '<div class="track-details">' +
-                  '<dl>' +
-                  '<dt class="track-details-dt">Name</dt><dd class="track-details-dd">' + track_name +
-                  '</dd>' +
-                  '<dt class="track-details-dt">Artists</dt>';
-                track_artists.forEach(element => {
-                  tracksSource += '<dd class="track-details-dd">' + element.name + '</dd>';
+                    var image_url = response.album.images[1].url;
+                    var track_uri = response.uri;
+                    var track_name = response.name;
+                    var track_artists = response.artists;
+                    var track_duration = duration;
+                    var track_explicit = explicit;
+                    tracksSource += '<div class="track-container"' +
+                      'trackURI="' + track_uri + '">' +
+                      '<img class="track-image" src="' + image_url + '">' +
+                      '<div class="track-details">' +
+                      '<dl>' +
+                      '<dt class="track-details-dt">Name</dt><dd class="track-details-dd">' +
+                      track_name +
+                      '</dd>' +
+                      '<dt class="track-details-dt">Artists</dt>';
+                    track_artists.forEach(element => {
+                      tracksSource += '<dd class="track-details-dd">' + element.name + '</dd>';
+                    });
+                    tracksSource +=
+                      '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">' +
+                      track_duration + '</dd>' +
+                      '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">' +
+                      track_explicit + '</dd>' +
+                      '</dl>' +
+                      '</div>' +
+                      '</div>';
+                    var tracksTemplate = Handlebars.compile(tracksSource),
+                      tracksPlaceholder = document.getElementById('tracks');
+                      tracksPlaceholder.innerHTML = tracksTemplate({});
+                    $(".track-container").mousedown(function () {
+                      play($(this).attr("trackURI"));
+                    })
+                  }
                 });
-                tracksSource += '<dt class="track-details-dt">Duration</dt><dd class="track-details-dd">' +
-                  track_duration + '</dd>' +
-                  '<dt class="track-details-dt">Explicit</dt><dd class="track-details-dd">' +
-                  track_explicit + '</dd>' +
-                  '</dl>' +
-                  '</div>' +
-                  '</div>';
-                var tracksTemplate = Handlebars.compile(tracksSource),
-                  tracksPlaceholder = document.getElementById('tracks');
-                tracksPlaceholder.innerHTML = tracksTemplate({});
-                $(".track-container").mousedown(function () {
-                  play($(this).attr("trackURI"));
-                })
-              }
-            });
-          });
-        }
+              });
+            }
+          }
+        });
         setTimeout(updateFavTracks, 2000);
       }
 
