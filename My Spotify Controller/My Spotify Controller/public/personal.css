@@ -1,30 +1,15 @@
-body {
-    background: rgba(0,0,0,0.9);
-}
-
 .btn-default {
     margin: 10px;
 }
 
-#playback {
-    border-top: 2px solid rgba(0,0,0,0.9);
+body {
+    background: rgba(0,0,0,0.9);
 }
 
-.container {
-    max-width: 1300px;
-    min-width: 1000px;
-    background: white;
-    box-shadow: 0px 0px 20px 10px black;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-    padding-bottom: 10px;
-    display: inline-block;
-}
-
-.right-hand-side {
-    min-width: 2000px;
-}
-
+/* 
+*
+* Navigation bar
+*/
 .navbar-p {
     position: sticky;
     background: rgba(0,0,0,0.9);
@@ -54,45 +39,313 @@ body {
     display: inline-block;
 }
 
+/* 
+*
+* Sidebars
+*/
 .side-bar-container {
     display: inline-block;
+    background: white;
+    box-shadow: 0px 0px 20px 10px black;
+    min-height: 100px;
+    padding: 10px;
 }
 
 .side-bar-container#left {
     width: 300px;
-    min-height: 100px;
     float: left;
+    position: relative;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    margin-right: 20px;
 }
 
 .side-bar-container#right {
     margin-left: 50px;
-    min-height: 100px;
     vertical-align: top;
+    border-radius: 10px;
 }
 
-.side-bar {
-    position: fixed;
-    top: 73px;
-    background: white;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-    padding: 10px;
-    font-size: 1em;
-    box-shadow: 0px 0px 20px 10px black;
-    z-index: 1;
+.side-bar { 
+    top: 0;
+    z-index: 1; 
 }
-
 
 #left-side-bar {
     left: 0;
+    font-size: 1em;
 }
 
 #right-side-bar {
     position: relative;
-    top: 10px;
+    font-size: 0.8em;
+}
+
+/* 
+*
+* devices list in the left sidebar
+*/
+#devices {
+    background: rgba(255,255,255,0.9);
+    margin-left: 10px;
+    margin-top: 10px;
+    color: black;
+}
+
+#devices h2 {
+    font-size: 20px;
+    margin: 0;
+}
+
+#devices dl {
+    margin: 0px;
+}
+
+#devices-image {
+    width: 30px;
+    object-fit: contain;
+    float: left;
+}
+
+.device-details-container {
+    display: inline-block;
+    width: 100%;
+}
+
+.device-details-container dd {
+    margin: 2px;
+}
+
+.device-details-container button {
+    transform: scale(0.8);
+}
+
+#device-id {
+    font-size: 0.8em;
+    width: inherit;
+    overflow-wrap: break-word;
+}
+
+#playback {
+    border-top: 2px solid rgba(0,0,0,0.9);
+}
+
+/* 
+*
+* The right side of the screen - excludes the left sidebar
+*/
+.right-hand-side {
+    min-width: 2000px;
+}
+
+/* 
+*
+* the main middle section
+*/
+.container {
+    max-width: 1300px;
+    min-width: 1000px;
+    background: white;
+    box-shadow: 0px 0px 20px 10px black;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding-bottom: 10px;
+    display: inline-block;
+}
+
+
+/* 
+*
+* the favourite tracks section and defines the 
+* classes used to display the tracks
+*/
+#tracks {
+    overflow-x: scroll;
+    height: 410px;
+    white-space: nowrap;
+    margin-bottom: 10px;
+}
+
+#tracks::-webkit-scrollbar {
+    margin: 0;
+    height: 15px;
+    box-shadow: 0px -2px 5px -1px rgba(0,0,0,0.5);
+}
+
+#tracks::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.9);
+}
+
+#tracks::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+}
+
+#tracks::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+#tracks::-webkit-scrollbar-button {
+    background-size: 100%;
+    width: 15px;
+    height: 15px;
+}
+
+::-webkit-scrollbar-button:horizontal:decrement {
+    background: rgba(0,0,0,0.9);
+    background-image: url("arrow\ left.png");
+}
+
+::-webkit-scrollbar-button:horizontal:increment {
+    background: rgba(0,0,0,0.9);
+    background-image: url("arrow\ right.png");
+}
+
+.track-outer-container {
+    display: inline-block;
+    margin: 10px;
+    margin-bottom: 10px;
+}
+
+.track-container { 
+    width: 300px;
+    height: 300px;
+    margin: 10px;
+    margin-bottom: 8px; 
+    position: relative;
+    display: inline-block;
+    z-index: 0;
+}
+
+.track-container:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.track-image {
+    height: 100%;
+    opacity: 1;
+}
+
+.track-details {
+    position: absolute;
+    white-space: normal;
+    background: rgba(0,0,0,0.8);
+    top: 50px;
+    left: 180px;
+    right: 0px;
+    text-align: left;
+    padding: 10px;
+    font-size: 0.8em
+}
+
+.track-details-dt {
+    margin: 0;
+    color: white;
+}
+
+.track-details-dd {
+    margin-left: 7px;
+    color: white;
+    overflow-wrap: normal;
+}
+
+/* 
+*
+* the searchbar and results
+*/
+#search-outer-container {
+    background: rgba(0,0,0,0.9);
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+}
+
+#search-outer-container h2 {
+    margin:0;
+    margin-bottom: 10px;
+}
+
+#searchbar-container {
+    background: white;
+    color: black;
     border-radius: 10px;
 }
 
+#searchbar-image {
+    float: left;
+    margin-left: 5px; 
+    margin-top: 1px;
+    margin-right: 10px;
+    height: 20px;
+}
+
+#song-searchbar {
+    display: inline-block;
+    width: 95%;
+    background: none;
+    color: black;
+    border: none;
+    border-radius: 10px;
+}
+
+#song-searchbar input {
+    line-height: 50px;
+}
+
+#song-searchbar:focus {
+    outline: none;
+}
+
+#song-search-results {
+    text-align: center;
+}
+
+/* 
+*
+* the options under each track that was returned form the search
+*/
+.track-options {
+    text-align: left;
+    height: 36px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+}
+
+.track-options button {
+    width: 30px;
+    height: 30px;
+    background-size: 100%;
+    border: none;
+}
+
+.track-options button:hover {
+    transform: scale(1.1);
+}
+
+.track-options button:focus {
+    outline: none;
+}
+
+.track-options button:active {
+    transform: scale(1);
+}
+
+.add-to-fav-btn {
+    background: none;
+    background-image: url("plus.png");
+}
+
+.remove-from-fav-btn {
+    background: none;
+    background-image: url("minus.png");
+}
+
+/* 
+*
+* the contents of the right sidebar, displays the queue
+*/
 .queue-container {
     margin-left: 10px;
     margin-top: 10px;
@@ -164,227 +417,6 @@ body {
     margin-top: 8px;
 }
 
-#devices {
-    background: rgba(255,255,255,0.9);
-    margin-left: 10px;
-    margin-top: 10px;
-    color: black;
-}
-
-#devices h2 {
-    font-size: 20px;
-    margin: 0;
-}
-
-#devices-image {
-    width: 30px;
-    object-fit: contain;
-    float: left;
-}
-
-.device-details-container {
-    display: inline-block;
-    width: 100%;
-}
-
-.device-details-container dd {
-    margin: 2px;
-}
-
-#device-id {
-    font-size: 0.8em;
-    width: inherit;
-    overflow-wrap: break-word;
-}
-
-.device-details-container button {
-    transform: scale(0.8);
-}
-
-#devices dl {
-    margin: 0px;
-}
-
-#search-outer-container {
-    background: rgba(0,0,0,0.9);
-    border-radius: 10px;
-    padding: 10px;
-    color: white;
-}
-
-#search-outer-container h2 {
-    margin:0;
-    margin-bottom: 10px;
-}
-
-#searchbar-container {
-    background: white;
-    color: black;
-    border-radius: 10px;
-}
-
-#searchbar-image {
-    float: left;
-    margin-left: 5px; 
-    margin-top: 1px;
-    margin-right: 10px;
-    height: 20px;
-}
-
-#song-searchbar {
-    display: inline-block;
-    width: 95%;
-    background: none;
-    color: black;
-    border: none;
-    border-radius: 10px;
-}
-
-#song-searchbar input {
-    line-height: 50px;
-}
-
-#song-searchbar:focus {
-    outline: none;
-}
-
-#song-search-results {
-    text-align: center;
-}
-
-#tracks {
-    overflow-x: scroll;
-    height: 410px;
-    white-space: nowrap;
-    margin-bottom: 10px;
-}
-
-#tracks::-webkit-scrollbar {
-    margin: 0;
-    height: 15px;
-    box-shadow: 0px -2px 5px -1px rgba(0,0,0,0.5);
-}
-
-#tracks::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.9);
-}
-
-#tracks::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.2);
-}
-
-#tracks::-webkit-scrollbar-thumb:hover {
-    background: rgba(255,255,255,0.3);
-}
-
-#tracks::-webkit-scrollbar-button {
-    background-size: 100%;
-    width: 15px;
-    height: 15px;
-}
-
-::-webkit-scrollbar-button:horizontal:decrement {
-    background: rgba(0,0,0,0.9);
-    background-image: url("arrow\ left.png");
-}
-
-::-webkit-scrollbar-button:horizontal:increment {
-    background: rgba(0,0,0,0.9);
-    background-image: url("arrow\ right.png");
-}
-
-.track-outer-container {
-    display: inline-block;
-    margin: 10px;
-    margin-bottom: 10px;
-}
-
-.track-options {
-    text-align: left;
-    height: 36px;
-    margin-left: 10px;
-    margin-right: 10px;
-    border-bottom: 2px solid rgba(255,255,255,0.2);
-}
-
-.track-options button {
-    width: 30px;
-    height: 30px;
-    background-size: 100%;
-    border: none;
-}
-
-.track-options button:hover {
-    transform: scale(1.1);
-}
-
-.track-options button:focus {
-    outline: none;
-}
-
-.track-options button:active {
-    transform: scale(1);
-}
-
-
-.add-to-fav-btn {
-    background: none;
-    background-image: url("plus.png");
-}
-
-.remove-from-fav-btn {
-    background: none;
-    background-image: url("minus.png");
-}
-
-.track-container { 
-    width: 300px;
-    height: 300px;
-    margin: 10px;
-    margin-bottom: 8px; 
-    position: relative;
-    display: inline-block;
-    z-index: 0;
-}
-
-.track-container:hover {
-    cursor: pointer;
-    transform: scale(1.05);
-    opacity: 0.9;
-}
-
-.track-image {
-    height: 100%;
-    opacity: 1;
-}
-
-.track-details {
-    position: absolute;
-    white-space: normal;
-    background: rgba(0,0,0,0.8);
-    top: 50px;
-    left: 180px;
-    right: 0px;
-    text-align: left;
-    padding: 10px;
-    font-size: 0.8em
-}
-
-.track-details-dt {
-    margin: 0;
-    color: white;
-}
-
-.track-details-dd {
-    margin-left: 7px;
-    color: white;
-    overflow-wrap: normal;
-}
-
-#oauth {
-    margin-top: 10px;
-    border-top: 2px solid rgba(0,0,0,0.9);
-}
 
 
 
