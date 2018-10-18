@@ -154,11 +154,53 @@
                       queuePlaceholder = document.getElementById('queue');
                     queuePlaceholder.innerHTML = queueTemplate({});
 
-                    // $(".upvote").mousedown(function() {
-                    //   var counter = $(this).parent().siblings(".element-vote-counter");
-                    //   var current_count = parseInt(counter.attr("counter"));
-                    //   counter.attr("counter", ("" + (++current_count)));
-                    // });
+                    $(".upvote").mousedown(function() {
+                      var upvote_btn = $(this);
+                      var uri = $(this).parent().parent().attr("trackURI");
+                      uri = uri.slice(14);
+                      $.ajax({
+                        url: '/queue/upvote',
+                        data: {
+                          track_uri: uri 
+                        },
+                        success: function () {
+                          $.ajax({
+                            url: '/queue',
+                            success: response => {
+                              queueList = response.queue;
+                              var index = queueList.findIndex((function (element) {
+                                return element.song === uri; 
+                              }));
+                              upvote_btn.parent().siblings(".element-vote-counter").text(queueList[index].votes)
+                            }
+                          });
+                        }
+                      });
+                    });
+
+                    $(".downvote").mousedown(function() {
+                      var downvote_btn = $(this);
+                      var uri = $(this).parent().parent().attr("trackURI");
+                      uri = uri.slice(14);
+                      $.ajax({
+                        url: '/queue/downvote',
+                        data: {
+                          track_uri: uri 
+                        },
+                        success: function () {
+                          $.ajax({
+                            url: '/queue',
+                            success: response => {
+                              queueList = response.queue;
+                              var index = queueList.findIndex((function (element) {
+                                return element.song === uri; 
+                              }));
+                              downvote_btn.parent().siblings(".element-vote-counter").text(queueList[index].votes)
+                            }
+                          });
+                        }
+                      });
+                    });
                   }
                 });
               });

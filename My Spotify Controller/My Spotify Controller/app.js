@@ -35,6 +35,11 @@ var generateRandomString = function (length) {
 var stateKey = 'spotify_auth_state';
 
 
+var user = {
+  id: '1',
+  username: 'Hurstiii'
+}
+
 //initialises the backend server object
 var app = express();
 
@@ -171,10 +176,27 @@ app.get('/favouriteTracks/remove', function (req, res) {
 
 var queue = [{song: "6rPO02ozF3bM7NnOV4h6s2", votes: 1}, 
              {song: "6mcxQ1Y3uQRU0IHsvdNLH1", votes: 1}];
+
 app.get('/queue', function (req, res) {
   res.send({
     'queue': queue
   });
+});
+
+app.get('/queue/upvote', function (req, res) {
+    var index = queue.findIndex((function (element) {
+    return element.song === req.query.track_uri; 
+  }));
+  queue[index].votes++;
+  res.send({});
+});
+
+app.get('/queue/downvote', function (req, res) {
+  var index = queue.findIndex((function (element) {
+  return element.song === req.query.track_uri; 
+}));
+queue[index].votes--;
+res.send({});
 });
 
 

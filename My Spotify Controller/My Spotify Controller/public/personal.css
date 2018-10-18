@@ -137,6 +137,7 @@ body {
 */
 .right-hand-side {
     min-width: 1920px;
+    white-space: nowrap;
 }
 
 /* 
@@ -301,6 +302,7 @@ body {
 
 #song-search-results {
     text-align: center;
+    white-space: normal;
 }
 
 /* 
@@ -402,6 +404,7 @@ button:active {
 .element-vote-counter {
     display: inline-block;
     vertical-align: middle;
+    min-width: 20px;
 }
 
 .queue-element-name {
